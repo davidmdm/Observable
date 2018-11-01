@@ -9,6 +9,7 @@ class Observable {
   }
 
   constructor(subscribefn) {
+    this.cleanup = [];
     this.subscribefn = subscribefn;
     this.createObserver = function(state) {
       let done = false;
@@ -51,7 +52,12 @@ class Observable {
 
     this.subscribefn(this.createObserver(state));
 
-    return { unsubscribe: () => (state.cancelled = true) };
+    return {
+      unsubscribe: () => {
+        this.cleanup.forEach(cb => cb());
+        state.cancelled = true;
+      },
+    };
   }
 
   pipe(...transforms) {
@@ -62,4 +68,12 @@ class Observable {
   }
 }
 
-module.exports = { Observable, ...transforms };
+const fromEvent = (emitter, event) => {
+  return new Observable(function(observer) {
+    const listener = x => observer.next(x);
+    this.cleanup.push(() => emitter.removeListener(event, listener));
+    emitter.on(event, listener);
+  });
+};
+
+module.exports = { Observable, fromEvent, ...transforms };

@@ -1,6 +1,22 @@
 'use strict';
 
-const { Observable, greaterThan, append, debounceTime, take } = require('./observable');
+const { fromEvent, Observable, greaterThan, append, debounceTime, tap, take } = require('./observable');
+
+// const { Observable, fromEvent } = require('rxjs');
+
+const Events = require('events');
+
+const emitter = new Events();
+
+emitter.on('e', () => {
+  console.log(emitter.listeners('e').length);
+});
+
+setInterval(() => emitter.emit('e'), 1000);
+
+const sub = fromEvent(emitter, 'e').subscribe(() => console.log('Observable received event'));
+
+setTimeout(() => sub.unsubscribe(), 5000);
 
 // Observable.create(observer => {
 //   observer.next(5);
@@ -23,12 +39,13 @@ const { Observable, greaterThan, append, debounceTime, take } = require('./obser
 //   )
 //   .subscribe(console.log);
 
-Observable.create(observer => {
-  let i = 0;
-  setInterval(() => observer.next(i++), 100);
-})
-  .pipe(
-    debounceTime(1000),
-    take(3)
-  )
-  .subscribe(console.log);
+// Observable.create(observer => {
+//   let i = 0;
+//   setInterval(() => observer.next(i++), 100);
+// })
+//   .pipe(
+//     tap(x => console.log('I am tapped in and i see:', x)),
+//     debounceTime(1000),
+//     take(3)
+//   )
+//   .subscribe(console.log);

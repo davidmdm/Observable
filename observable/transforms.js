@@ -1,15 +1,5 @@
 'use strict';
 
-const greaterThan = num => (value, done) => {
-  if (value > num) {
-    done(value);
-  }
-};
-
-const append = suffix => (value, done) => {
-  done(value + suffix);
-};
-
 const tap = fn => (value, done) => {
   fn(value);
   done(value);
@@ -52,4 +42,29 @@ const take = j => {
   };
 };
 
-module.exports = { greaterThan, append, tap, delay, debounceTime, take };
+const map = fn => (value, done) => {
+  done(fn(value));
+};
+
+const scan = function(fn, seed) {
+  let hasSeed = arguments.length > 1;
+  return (value, done) => {
+    if (!hasSeed) {
+      seed = value;
+      hasSeed = true;
+      return done(value);
+    }
+    const result = fn(seed, value);
+    seed = result;
+    done(result);
+  };
+};
+
+module.exports = {
+  tap,
+  delay,
+  debounceTime,
+  take,
+  map,
+  scan,
+};

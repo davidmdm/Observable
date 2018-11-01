@@ -1,6 +1,13 @@
 'use strict';
 
+const { combine } = require('./util');
+const transforms = require('./transforms');
+
 class Observable {
+  static create(subscribe) {
+    return new Observable(subscribe);
+  }
+
   constructor(subscribefn) {
     this.subscribefn = subscribefn;
     this.createObserver = function(state) {
@@ -35,42 +42,24 @@ class Observable {
   }
 
   subscribe(obj) {
-    const options = {
+    const state = {
       errorFn: obj.error,
       nextFn: typeof obj === 'function' ? obj : obj.next,
       completeFn: obj.complete,
       cancelled: false,
     };
 
-    this.subscribefn(this.createObserver(options));
+    this.subscribefn(this.createObserver(state));
 
-    return { unsubscribe: () => (options.cancelled = true) };
+    return { unsubscribe: () => (state.cancelled = true) };
   }
 
   pipe(...transforms) {
     return new Observable(observer => {
-      this.subscribe(value => {
-        const combinedTransform = transforms.reduce((combined, transform) => {
-          return (value, done) => combined(value, result => transform(result, done));
-        });
-        combinedTransform(value, result => observer.next(result));
-      });
+      const next = observer.next.bind(observer);
+      this.subscribe(value => combine(transforms)(value, next));
     });
-  }
-
-  static create(subscribe) {
-    return new Observable(subscribe);
   }
 }
 
-const greaterThan = num => (value, done) => {
-  if (value > num) {
-    done(value);
-  }
-};
-
-const append = suffix => (value, done) => {
-  done(value + suffix);
-};
-
-module.exports = { Observable, greaterThan, append };
+module.exports = { Observable, ...transforms };

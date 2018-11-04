@@ -29,4 +29,19 @@ class Subject {
   }
 }
 
-module.exports = { Subject };
+class AsyncSubject extends Subject {
+  constructor() {
+    super();
+  }
+
+  next(value) {
+    this.lastValue = value;
+  }
+
+  complete() {
+    this.observer.next(this.lastValue);
+    this.observer.complete();
+  }
+}
+
+module.exports = { Subject, AsyncSubject };

@@ -1,10 +1,10 @@
 'use strict';
 
-const { Subject, scan } = require('./observable');
+const { AsyncSubject, scan } = require('./observable');
 
 let i = 0;
 
-const subject = new Subject();
+const subject = new AsyncSubject();
 
 setInterval(() => subject.next(i++), 1000);
 

@@ -1,14 +1,15 @@
 'use strict';
 
-const { Observable, scan } = require('./observable');
+const { Subject, scan } = require('./observable');
 
-Observable.create(observer => {
-  observer.next(1);
-  observer.next(2);
-  observer.next(3);
-  observer.next(4);
-  observer.next(5);
-  observer.next(6);
-})
-  .pipe(scan((acc, value) => acc + value, -21))
-  .subscribe(console.log);
+let i = 0;
+
+const subject = new Subject();
+
+setInterval(() => subject.next(i++), 1000);
+
+subject.subscribe(x => console.log('A:', x));
+
+setTimeout(() => subject.subscribe(x => console.log('B:', x)), 3500);
+
+setTimeout(() => subject.complete(), 6500);

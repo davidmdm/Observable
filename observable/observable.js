@@ -1,6 +1,36 @@
 'use strict';
 
-const { combine, createObserver } = require('./util');
+const { combine } = require('./util');
+
+function createObserver(state) {
+  let done = false;
+  const { nextFn, completeFn, errorFn } = state;
+
+  const observer = (function*() {
+    while (true) {
+      const val = yield;
+      if (done || state.cancelled) {
+        return;
+      }
+      if (nextFn) nextFn(val);
+    }
+  })();
+
+  observer.next();
+
+  observer.complete = () => {
+    done = true;
+    if (completeFn) completeFn();
+  };
+
+  observer.error = err => {
+    done = true;
+    if (errorFn) errorFn(err);
+    else console.error(err);
+  };
+
+  return observer;
+}
 
 class Observable {
   static create(subscribe) {
@@ -12,7 +42,7 @@ class Observable {
     this.subscribefn = subscribefn;
   }
 
-  subscribe(obj) {
+  subscribe(obj = {}) {
     const state = {
       errorFn: obj.error,
       nextFn: typeof obj === 'function' ? obj : obj.next,
@@ -38,4 +68,4 @@ class Observable {
   }
 }
 
-module.exports = { Observable };
+module.exports = { Observable, createObserver };

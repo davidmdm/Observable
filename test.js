@@ -1,15 +1,31 @@
 'use strict';
 
-const { AsyncSubject, scan } = require('./observable');
+const { Observable, mergeMap } = require('./observable');
 
-let i = 0;
+const genEven = () => {
+  const i = Math.floor(8 * Math.random());
+  if (i % 2 === 0) {
+    return i;
+  }
+  return i + 1;
+};
 
-const subject = new AsyncSubject();
+const genOdd = () => genEven() + 1;
 
-setInterval(() => subject.next(i++), 1000);
+const Even = new Observable(observer => {
+  const interval = setInterval(() => observer.next(genEven()), 500);
+  setTimeout(() => {
+    clearInterval(interval);
+    observer.complete();
+  }, 10000);
+});
 
-subject.subscribe(x => console.log('A:', x));
+const Odd = new Observable(observer => {
+  const interval = setInterval(() => observer.next(genOdd(), 500));
+  setTimeout(() => {
+    clearInterval(interval);
+    observer.complete();
+  }, 10000);
+});
 
-setTimeout(() => subject.subscribe(x => console.log('B:', x)), 3500);
-
-setTimeout(() => subject.complete(), 6500);
+Even.subscribe(console.log);

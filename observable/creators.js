@@ -10,4 +10,15 @@ const fromEvent = (emitter, event) => {
   });
 };
 
-module.exports = { fromEvent };
+const fromPromise = promise => {
+  return new Observable(observer => {
+    promise
+      .then(value => {
+        observer.next(value);
+        observer.complete();
+      })
+      .catch(err => observer.error(err));
+  });
+};
+
+module.exports = { fromEvent, fromPromise };

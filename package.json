@@ -1,0 +1,26 @@
+{
+  "name": "Observable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "dependencies": {
+    "parcel": "^1.12.3",
+    "parcel-bundler": "^1.12.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "parcel build ./observable/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidmdm/Observable.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/davidmdm/Observable/issues"
+  },
+  "homepage": "https://github.com/davidmdm/Observable#readme"
+}

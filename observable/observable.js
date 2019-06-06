@@ -37,6 +37,13 @@ class Observable {
     return new Observable(subscribe);
   }
 
+  static of(value) {
+    return new Observable(observer => {
+      observer.next(value);
+      observer.complete();
+    });
+  }
+
   constructor(subscribefn) {
     this.cleanup = [];
     this.subscribefn = subscribefn;

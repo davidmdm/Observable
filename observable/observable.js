@@ -1,6 +1,6 @@
 'use strict';
 
-function createObserver(state) {
+function createSubscriber(state) {
   let finished = false;
   const { nextFn, completeFn, errorFn } = state;
 
@@ -43,13 +43,6 @@ class Observable {
     return new Observable(subscribe);
   }
 
-  static of(value) {
-    return new Observable(observer => {
-      observer.next(value);
-      observer.complete();
-    });
-  }
-
   constructor(subscribefn) {
     this.cleanup = [];
     this.subscribefn = subscribefn;
@@ -63,7 +56,7 @@ class Observable {
       cancelled: false,
     };
 
-    this.subscribefn(createObserver(state));
+    this.subscribefn(createSubscriber(state));
 
     return {
       unsubscribe: () => {
@@ -99,4 +92,4 @@ function combine(transforms) {
   });
 }
 
-module.exports = { Observable, createObserver };
+module.exports = { Observable, createSubscriber };

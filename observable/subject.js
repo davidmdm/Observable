@@ -1,9 +1,9 @@
-const { createObserver } = require('./observable');
+const { createSubscriber } = require('./observable');
 
 class Subject {
   constructor() {
     this.listeners = [];
-    this.observer = createObserver({ nextFn: value => this.listeners.forEach(cb => cb(value)) });
+    this.subscriber = createSubscriber({ nextFn: value => this.listeners.forEach(cb => cb(value)) });
   }
 
   subscribe(cb) {
@@ -17,15 +17,15 @@ class Subject {
   }
 
   next(value) {
-    this.observer.next(value);
+    this.subscriber.next(value);
   }
 
   complete() {
-    this.observer.complete();
+    this.subscriber.complete();
   }
 
   error(e) {
-    this.observer.error(e);
+    this.subscriber.error(e);
   }
 }
 
@@ -39,8 +39,8 @@ class AsyncSubject extends Subject {
   }
 
   complete() {
-    this.observer.next(this.lastValue);
-    this.observer.complete();
+    this.subscriber.next(this.lastValue);
+    this.subscriber.complete();
   }
 }
 

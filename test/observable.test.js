@@ -2,7 +2,7 @@
 
 const { assert } = require('chai');
 const { Observable } = require('../observable');
-const transforms = require('../observable/transforms');
+const operators = require('../observable/operators');
 
 describe('Observables', () => {
   describe('Basic cases', () => {
@@ -73,7 +73,7 @@ describe('Observables', () => {
 
   describe('pipe operator and transforms', () => {
     it('should tap and not affect subscription', async () => {
-      const { tap } = transforms;
+      const { tap } = operators;
 
       const result = [];
       const tapArray = [];
@@ -93,7 +93,7 @@ describe('Observables', () => {
     });
 
     it('should filter', async () => {
-      const { tap, filter } = transforms;
+      const { tap, filter } = operators;
 
       const result = [];
       const tapArray = [];
@@ -116,7 +116,7 @@ describe('Observables', () => {
     });
 
     it('should take the number of values requested', async () => {
-      const { take } = transforms;
+      const { take } = operators;
 
       const result = [];
 
@@ -136,7 +136,7 @@ describe('Observables', () => {
     });
 
     it('should map the result', async () => {
-      const { map } = transforms;
+      const { map } = operators;
       const result = [];
 
       new Observable(subscriber => {
@@ -153,7 +153,7 @@ describe('Observables', () => {
     });
 
     it('should scan (same as a reduce function for arrays)', async () => {
-      const { scan } = transforms;
+      const { scan } = operators;
       const result = [];
 
       new Observable(subscriber => {
@@ -172,7 +172,7 @@ describe('Observables', () => {
     });
 
     it('should scan with an initial seed (same as a reduce function for arrays)', async () => {
-      const { scan } = transforms;
+      const { scan } = operators;
       const result = [];
 
       new Observable(subscriber => {
@@ -191,7 +191,7 @@ describe('Observables', () => {
     });
 
     it('should add a delay to all events', async () => {
-      const { delay } = transforms;
+      const { delay } = operators;
       const result = [];
 
       new Observable(subscriber => {
@@ -210,7 +210,7 @@ describe('Observables', () => {
     });
 
     it('should debounce values', async () => {
-      const { debounceTime } = transforms;
+      const { debounceTime } = operators;
       const result = [];
 
       new Observable(subscriber => {

@@ -1,4 +1,4 @@
-const { createObserver } = require('./util');
+const { createObserver } = require('./observable');
 
 class Subject {
   constructor() {

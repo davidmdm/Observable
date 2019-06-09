@@ -2,17 +2,17 @@
 
 const tap = fn => (value, next) => {
   fn(value);
-  next(value);
+  next(null, value);
 };
 
 const filter = fn => (value, next) => {
-  if (filter(value)) {
-    next(value);
+  if (fn(value)) {
+    next(null, value);
   }
 };
 
 const delay = ms => (value, next) => {
-  setTimeout(next, ms, value);
+  setTimeout(() => next(null, value), ms);
 };
 
 const debounceTime = ms => {
@@ -23,11 +23,11 @@ const debounceTime = ms => {
     const now = Date.now();
     if (now > gate) {
       gate = now + ms;
-      return next(value);
+      return next(null, value);
     }
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      next(value);
+      next(null, value);
       gate = Date.now() + ms;
     }, gate - now);
   };
@@ -37,13 +37,13 @@ const take = j => {
   let i = 0;
   return (value, next) => {
     if (i++ < j) {
-      next(value);
+      next(null, value);
     }
   };
 };
 
 const map = fn => (value, next) => {
-  next(fn(value));
+  next(null, fn(value));
 };
 
 const scan = function(fn, seed) {
@@ -52,17 +52,20 @@ const scan = function(fn, seed) {
     if (!hasSeed) {
       seed = value;
       hasSeed = true;
-      return next(value);
+      return next(null, value);
     }
     const result = fn(seed, value);
     seed = result;
-    next(result);
+    next(null, result);
   };
 };
 
 const mergeMap = fn => (value, next) => {
   const observable = fn(value);
-  observable.subscribe(next);
+  observable.subscribe({
+    next: value => next(null, value),
+    error: err => next(err),
+  });
 };
 
 const switchMap = fn => {
@@ -72,8 +75,11 @@ const switchMap = fn => {
       unsubscribe();
     }
     const observable = fn(value);
-    const subscription = observable.subscribe(next);
-    unsubscribe = subscription.unsubscribe.bind(observable);
+    const subscription = observable.subscribe({
+      next: value => next(null, value),
+      error: err => next(err),
+    });
+    unsubscribe = subscription.unsubscribe;
   };
 };
 
@@ -86,7 +92,8 @@ const exhaustMap = fn => {
     exhausted = false;
     const observable = fn(value);
     observable.subscribe({
-      next,
+      next: value => next(null, value),
+      error: err => next(err),
       complete: () => {
         exhausted = true;
       },
@@ -105,7 +112,8 @@ const concatMap = fn => {
       return;
     }
     active.subscribe({
-      next,
+      next: value => next(null, value),
+      error: err => next(err),
       complete: () => startNextActiveObservable(next),
     });
   };
@@ -124,6 +132,7 @@ module.exports = {
   debounceTime,
   take,
   map,
+  filter,
   scan,
   mergeMap,
   switchMap,

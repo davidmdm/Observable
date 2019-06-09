@@ -21,4 +21,11 @@ const fromPromise = promise => {
   });
 };
 
-module.exports = { fromEvent, fromPromise };
+const of = value => {
+  return new Observable(observer => {
+    observer.next(value);
+    observer.complete();
+  });
+};
+
+module.exports = { fromEvent, fromPromise, of };

@@ -1,15 +1,15 @@
 'use strict';
 
-const { combine } = require('./util');
-
-function createObserver(state) {
-  let done = false;
+function createSubscriber(state) {
+  let finished = false;
   const { nextFn, completeFn, errorFn } = state;
+
+  const isDone = () => finished || state.cancelled;
 
   const observer = (function*() {
     while (true) {
       const val = yield;
-      if (done || state.cancelled) {
+      if (isDone()) {
         return;
       }
       if (nextFn) nextFn(val);
@@ -19,12 +19,18 @@ function createObserver(state) {
   observer.next();
 
   observer.complete = () => {
-    done = true;
+    if (isDone()) {
+      return;
+    }
+    finished = true;
     if (completeFn) completeFn();
   };
 
   observer.error = err => {
-    done = true;
+    if (isDone()) {
+      return;
+    }
+    finished = true;
     if (errorFn) errorFn(err);
     else console.error(err);
   };
@@ -35,13 +41,6 @@ function createObserver(state) {
 class Observable {
   static create(subscribe) {
     return new Observable(subscribe);
-  }
-
-  static of(value) {
-    return new Observable(observer => {
-      observer.next(value);
-      observer.complete();
-    });
   }
 
   constructor(subscribefn) {
@@ -57,7 +56,7 @@ class Observable {
       cancelled: false,
     };
 
-    this.subscribefn(createObserver(state));
+    this.subscribefn(createSubscriber(state));
 
     return {
       unsubscribe: () => {
@@ -69,10 +68,28 @@ class Observable {
 
   pipe(...transforms) {
     return new Observable(observer => {
-      const next = observer.next.bind(observer);
-      this.subscribe(value => combine(transforms)(value, next));
+      this.subscribe(value =>
+        combine(transforms)(value, (err, result) => {
+          if (err) {
+            return observer.error(err);
+          }
+          observer.next(result);
+        })
+      );
     });
   }
 }
 
-module.exports = { Observable, createObserver };
+function combine(transforms) {
+  return transforms.reduce((prev, next) => {
+    return (value, done) =>
+      prev(value, (err, result) => {
+        if (err) {
+          return done(err);
+        }
+        next(result, done);
+      });
+  });
+}
+
+module.exports = { Observable, createSubscriber };

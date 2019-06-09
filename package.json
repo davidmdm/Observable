@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "test.js",
+  "scripts": {
+    "build": "parcel build ./observable/index.js",
+    "test": "mocha \"./test/**/*.test.js\" --exit"
+  },
   "dependencies": {
     "parcel": "^1.12.3",
     "parcel-bundler": "^1.12.3"
   },
-  "devDependencies": {},
-  "scripts": {
-    "build": "parcel build ./observable/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4"
   },
   "repository": {
     "type": "git",

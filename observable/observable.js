@@ -6,7 +6,7 @@ function createSubscriber(state) {
 
   const isDone = () => finished || state.cancelled;
 
-  const observer = (function*() {
+  const iterator = (function*() {
     while (true) {
       const val = yield;
       if (isDone()) {
@@ -16,26 +16,33 @@ function createSubscriber(state) {
     }
   })();
 
-  observer.next();
+  iterator.next();
 
-  observer.complete = () => {
-    if (isDone()) {
-      return;
-    }
-    finished = true;
-    if (completeFn) completeFn();
+  const subscriber = {
+    next: x => void iterator.next(x),
+    complete: () => {
+      if (isDone()) {
+        return;
+      }
+      finished = true;
+      if (completeFn) {
+        completeFn();
+      }
+    },
+    error: err => {
+      if (isDone()) {
+        return;
+      }
+      finished = true;
+      if (errorFn) {
+        errorFn(err);
+      } else {
+        console.error(err);
+      }
+    },
   };
 
-  observer.error = err => {
-    if (isDone()) {
-      return;
-    }
-    finished = true;
-    if (errorFn) errorFn(err);
-    else console.error(err);
-  };
-
-  return observer;
+  return subscriber;
 }
 
 class Observable {

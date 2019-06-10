@@ -67,13 +67,17 @@ class Observable {
   }
 
   pipe(...transforms) {
-    return new Observable(observer => {
+    if (transforms.length === 0) {
+      return this;
+    }
+    const pipeline = combine(transforms);
+    return new Observable(subscriber => {
       this.subscribe(value =>
-        combine(transforms)(value, (err, result) => {
+        pipeline(value, (err, result) => {
           if (err) {
-            return observer.error(err);
+            return subscriber.error(err);
           }
-          observer.next(result);
+          subscriber.next(result);
         })
       );
     });

@@ -33,6 +33,17 @@ const debounceTime = ms => {
   };
 };
 
+const throttleTime = ms => {
+  let gate = -1;
+  return (value, next) => {
+    const now = Date.now();
+    if (now > gate) {
+      gate = now + ms;
+      return next(null, value);
+    }
+  };
+};
+
 const take = j => {
   let i = 0;
   return (value, next) => {
@@ -130,6 +141,7 @@ module.exports = {
   tap,
   delay,
   debounceTime,
+  throttleTime,
   take,
   map,
   filter,

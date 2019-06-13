@@ -229,6 +229,23 @@ describe('Observables', () => {
         // will be taken, but there should only be half of the values that get through.
         assert.include([4, 5, 6], result.length);
       });
+
+      it('should throttle values', async () => {
+        const { throttleTime } = operators;
+        const result = [];
+
+        new Observable(subscriber => {
+          let i = 1;
+          const interval = setInterval(() => subscriber.next(i++), 10);
+          setTimeout(() => clearInterval(interval), 50);
+        })
+          .pipe(throttleTime(35))
+          .subscribe(x => result.push(x));
+
+        await new Promise(resolve => setTimeout(resolve, 60));
+
+        assert.include([1, 3], result.length);
+      });
     });
 
     describe('Higher-Order Operators', () => {

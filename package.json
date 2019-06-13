@@ -5,7 +5,7 @@
   "main": "test.js",
   "scripts": {
     "build": "parcel build ./observable/index.js",
-    "test": "mocha \"./test/**/*.test.js\" --exit"
+    "test": "nyc mocha \"./test/**/*.test.js\" --exit"
   },
   "dependencies": {
     "parcel": "^1.12.3",
@@ -13,7 +13,8 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.1.4"
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,22 @@
   "bugs": {
     "url": "https://github.com/davidmdm/Observable/issues"
   },
-  "homepage": "https://github.com/davidmdm/Observable#readme"
+  "homepage": "https://github.com/davidmdm/Observable#readme",
+  "nyc": {
+    "include": [
+      "**/*.js"
+    ],
+    "exclude": [
+      "node_modules"
+    ],
+    "extension": [
+      ".js"
+    ],
+    "reporter": [
+      "html",
+      "text"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  }
 }

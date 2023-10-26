@@ -1,5 +1,5 @@
 {
-  "name": "Observable",
+  "name": "observable",
   "version": "1.0.0",
   "description": "",
   "main": "test.js",
@@ -8,13 +8,13 @@
     "test": "nyc mocha \"./test/**/*.test.js\" --exit"
   },
   "dependencies": {
-    "parcel": "^1.12.3",
-    "parcel-bundler": "^1.12.3"
+    "parcel": "^2.10.1",
+    "parcel-bundler": "^1.12.5"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^6.1.4",
-    "nyc": "^14.1.1"
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
   },
   "repository": {
     "type": "git",
